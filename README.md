@@ -1,6 +1,6 @@
 <div align="center">
     <h1>Server Side Anti Cheat</h1>
-    <img src="https://static.wikia.nocookie.net/unturned-bunker/images/3/3c/Beacon_1194.png/revision/latest/scale-to-width-down/128?cb=20160617225641"></img>
+    <img height="150px;" src="https://darknesscommunity.club/assets/plugins/images/server/anticheat.png"></img>
 </div>
 
 <h1>Features</h1>
