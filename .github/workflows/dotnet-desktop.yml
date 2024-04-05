@@ -32,7 +32,7 @@ jobs:
           mkdir ./publish/DAC
           mkdir ./publish/DAC/libraries
           mv ./publish/netstandard2.1/DAC.dll ./publish/DAC/DAC.dll
-          mv ./libraries/*.dll ./publish/DAC/libraries/*.dll
+          mv ./libraries/* ./publish/DAC/libraries/
 
 
       - name: Git Semantic Version
