@@ -1,0 +1,8 @@
+C:\Users\funes\Desktop\DAC\DAC\bin\Release\netstandard2.1\DAC.deps.json
+C:\Users\funes\Desktop\DAC\DAC\bin\Release\netstandard2.1\DAC.dll
+C:\Users\funes\Desktop\DAC\DAC\bin\Release\netstandard2.1\DAC.pdb
+C:\Users\funes\Desktop\DAC\DAC\obj\Release\netstandard2.1\DAC.csproj.AssemblyReference.cache
+C:\Users\funes\Desktop\DAC\DAC\obj\Release\netstandard2.1\DAC.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\funes\Desktop\DAC\DAC\obj\Release\netstandard2.1\DAC.csproj.CoreCompileInputs.cache
+C:\Users\funes\Desktop\DAC\DAC\obj\Release\netstandard2.1\DAC.dll
+C:\Users\funes\Desktop\DAC\DAC\obj\Release\netstandard2.1\DAC.pdb
