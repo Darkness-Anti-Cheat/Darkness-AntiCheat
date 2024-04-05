@@ -30,7 +30,7 @@ jobs:
         run: |
           dotnet publish -c Release --no-build --output ./publish
           mkdir ./publish/DAC
-          mkdir ./publish/DAC/Libraries
+          mkdir ./publish/DAC/libraries
           mv ./publish/netstandard2.1/DAC.dll ./publish/DAC/DAC.dll
           mv ./libraries/*.dll ./publish/DAC/libraries/*.dll
 
