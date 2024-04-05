@@ -5,8 +5,8 @@
     <RootNamespace>Darkness_Anti_Cheat</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	<OutputPath>bin\</OutputPath>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	<OutputPath>..\publish\</OutputPath>
 	<DefineConstants>TRACE;DEBUG;DEV</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
