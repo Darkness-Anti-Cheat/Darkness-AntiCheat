@@ -1,5 +1,8 @@
-.vs
-DAC/bin
-DAC/obj
-publish/netstandard2.1
-/.vs/DAC/FileContentIndex
+.vs/
+.vscode/
+obj/
+bin/
+DAC/bin/
+DAC/obj/
+publish/netstandard2.1/
+publish/Release/
