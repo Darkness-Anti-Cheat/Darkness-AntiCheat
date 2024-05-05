@@ -9,6 +9,15 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
 <div align="center">
     <img height="500px;" src=".github\image-examples\example.png"></img>
 </div>
+
+<h1>What can detect?</h1>
+- Silent-Aim
+- Anti-Aim
+- No-Clip
+- Fake-Lag (Clumsy or other programs)
+- Admin Abuse
+- Anti-Free Cam
+
 <h1>Installation and requirements</h1>
 
 - rocketmod
