@@ -11,6 +11,7 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
 </div>
 
 <h1>What can detect?</h1>
+
 - Silent-Aim
 - Anti-Aim
 - No-Clip
