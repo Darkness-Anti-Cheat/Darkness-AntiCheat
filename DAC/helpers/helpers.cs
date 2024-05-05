@@ -1,3 +1,4 @@
+using Darkness_Anti_Cheat.components;
 using Newtonsoft.Json.Linq;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -6,6 +7,7 @@ using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
@@ -15,6 +17,57 @@ namespace DAC
 {
     public class Darkness_Anti_Cheat_Functions
     {
+        // Future Usage
+        public enum keys : int
+        {
+            Unknown = -1,
+            Jump = 0,
+            LPunch = 1,
+            RPunch = 2,
+            Crouch = 3,
+            Prone = 4,
+            Sprint = 5,
+            Leanleft = 6,
+            LeanRight = 7,
+            HoldBreath = 9,
+            // Plugin keys
+            CodeHotkey1 = 10,
+            CodeHotkey2 = 11,
+            CodeHotkey3 = 12,
+            CodeHotkey4 = 13
+        }
+
+        public static bool IsPlayerVisible(UnturnedPlayer player1, UnturnedPlayer player2)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(player1.Player.transform.position, player2.Player.transform.position - player1.Player.transform.position, out hit))
+            {
+                return hit.collider.GetComponent<UnturnedPlayer>() == player2;
+            }
+            return false;
+        }
+
+        public UnturnedPlayer FindClosestPlayer(UnturnedPlayer targetPlayer)
+        {
+            UnturnedPlayer closestPlayer = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (var otherPlayer in Provider.clients.Select(c => UnturnedPlayer.FromSteamPlayer(c)))
+            {
+                if (otherPlayer != targetPlayer)
+                {
+                    float distance = Vector3.Distance(targetPlayer.Position, otherPlayer.Position);
+
+                    if (distance < closestDistance)
+                    {
+                        closestPlayer = otherPlayer;
+                        closestDistance = distance;
+                    }
+                }
+            }
+
+            return closestPlayer;
+        }
         public static byte[] ByteArray(string imagePath)
         {
             byte[] imageByteArray = null;
@@ -62,6 +115,7 @@ namespace DAC
 
             if(!admin)
             {
+                arrFields.Add(new JObject { { "name", "MS" }, { "value", player.Ping }, { "inline", true } });
                 arrFields.Add(new JObject { { "name", "Kills" }, { "value", player.Player.GetComponent<PlayerComponent>().Kills }, { "inline", true } });
                 arrFields.Add(new JObject { { "name", "Deaths" }, { "value", player.Player.GetComponent<PlayerComponent>().Deaths }, { "inline", true } });
                 arrFields.Add(new JObject { { "name", "Headshots" }, { "value", player.Player.GetComponent<PlayerComponent>().Headshots }, { "inline", true } });

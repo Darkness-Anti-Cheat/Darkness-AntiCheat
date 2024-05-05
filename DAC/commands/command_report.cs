@@ -57,7 +57,7 @@ namespace DAC
 
             if (commands.Length <= 1)
             {
-                ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> Syntax: /report <player> <reason>".Replace('(', '<').Replace(')', '>'), UnityEngine.Color.white, null, player.SteamPlayer(), EChatMode.WELCOME, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
+                ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> Syntax: /report {Syntax}".Replace('(', '<').Replace(')', '>'), UnityEngine.Color.white, null, player.SteamPlayer(), EChatMode.WELCOME, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
             }
             else if (player.Equals(to_player_report))
             {

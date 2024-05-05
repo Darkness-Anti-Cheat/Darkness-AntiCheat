@@ -22,12 +22,21 @@ namespace DAC
 
     public class Configuration : IRocketPluginConfiguration, IDefaultable
     {
+        public bool player_ping_high;
 
         public bool global_chat;
 
         public bool aimbot_detection;
 
         public bool noclip_detection;
+
+        public bool anti_free_cam;
+
+        public bool clumsy_detect_fake_lag;
+
+        public bool anti_aim_detection;
+
+        public int player_ping;
 
         //public bool proxy_detection;
 
@@ -64,9 +73,14 @@ namespace DAC
             abuse_player_webhook = "";
 
             logs = "";
-
             //proxy_detection = false;
             //trust_detection = false;
+
+            player_ping = 150;
+            player_ping_high = true;
+            clumsy_detect_fake_lag = true;
+            anti_aim_detection = true;
+            anti_free_cam = true;
             abuse_detection = true;
             aimbot_detection = true;
             noclip_detection = true;

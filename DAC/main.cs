@@ -1,3 +1,4 @@
+using Darkness_Anti_Cheat.components;
 using Rocket.Core.Plugins;
 using Rocket.Unturned;
 using Rocket.Unturned.Events;
@@ -27,9 +28,22 @@ namespace DAC
             Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] (WARNING) ¡This plugin require a discord Server!", ConsoleColor.DarkYellow);
 
             if (Configuration.Instance.noclip_detection)
+            {
+                Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] no_clip event loaded", ConsoleColor.DarkCyan);
                 ThreadPool.QueueUserWorkItem((yes) => Darkness_Anti_Cheat_Events.no_clip());
+            }
 
-            Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] no_clip event loaded", ConsoleColor.DarkCyan);
+            if (Configuration.Instance.anti_free_cam)
+            {
+                Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] anti_free_cam event loaded", ConsoleColor.DarkCyan);
+                ThreadPool.QueueUserWorkItem((yes) => Darkness_Anti_Cheat_Events.anti_free_cam());
+            }
+
+            if(Configuration.Instance.clumsy_detect_fake_lag)
+            {
+                Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] clumsy_detect_fake_lag event loaded", ConsoleColor.DarkCyan);
+                ThreadPool.QueueUserWorkItem((yes) => Darkness_Anti_Cheat_Events.clumsy_detect_fake_lag());
+            }
 
             UnturnedPlayerEvents.OnPlayerDeath += OnPlayerDeath; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] onPlayerDeath event loaded", ConsoleColor.DarkCyan);
             UnturnedPlayerEvents.OnPlayerChatted += OnPlayerChatted; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerChatted event loaded", ConsoleColor.DarkCyan);
