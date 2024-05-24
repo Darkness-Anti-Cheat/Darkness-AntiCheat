@@ -31,7 +31,7 @@ namespace DAC
                     // Increase rate...
                     UnturnedPlayer.FromCSteamID(killer).Player.GetComponent<PlayerComponent>().Rate++;
                 }
-                else if (UnturnedPlayer.FromCSteamID(killer).Player.look.pitch >= 89)
+                else if (UnturnedPlayer.FromCSteamID(killer).Player.look.pitch >= -89)
                 {
                     UnturnedPlayer.FromCSteamID(killer).Player.GetComponent<PlayerComponent>().Rate++;
                 }
