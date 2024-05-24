@@ -5,6 +5,7 @@ using SDG.Unturned;
 using Steamworks;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -115,18 +116,18 @@ namespace DAC
 
             if(!admin)
             {
-                arrFields.Add(new JObject { { "name", "MS" }, { "value", player.Ping }, { "inline", true } });
-                arrFields.Add(new JObject { { "name", "Kills" }, { "value", player.Player.GetComponent<PlayerComponent>().Kills }, { "inline", true } });
-                arrFields.Add(new JObject { { "name", "Deaths" }, { "value", player.Player.GetComponent<PlayerComponent>().Deaths }, { "inline", true } });
-                arrFields.Add(new JObject { { "name", "Headshots" }, { "value", player.Player.GetComponent<PlayerComponent>().Headshots }, { "inline", true } });
-                arrFields.Add(new JObject { { "name", "KDA" }, { "value", (player.Player.GetComponent<PlayerComponent>().Kills / (double)player.Player.GetComponent<PlayerComponent>().Deaths) }, { "inline", true } });
+                arrFields.Add(new JObject { { "name", "MS" }, { "value", to_player.Ping }, { "inline", true } });
+                arrFields.Add(new JObject { { "name", "Kills" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Kills }, { "inline", true } });
+                arrFields.Add(new JObject { { "name", "Deaths" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Deaths }, { "inline", true } });
+                arrFields.Add(new JObject { { "name", "Headshots" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Headshots }, { "inline", true } });
+                arrFields.Add(new JObject { { "name", "KDA" }, { "value", (to_player.Player.GetComponent<PlayerComponent>().Kills / (double)to_player.Player.GetComponent<PlayerComponent>().Deaths) }, { "inline", true } });
             }
             else
             {
                 arrFields.Add(new JObject { { "name", "Command Executed" }, { "value", command }, { "inline", true } });
             }
 
-            arrFields.Add(new JObject { { "name", "Location" }, { "value", player.Position.ToString() }, { "inline", true } });
+            arrFields.Add(new JObject { { "name", "Location" }, { "value", to_player.Position.ToString() }, { "inline", true } });
             arrFields.Add(new JObject { { "name", "Map" }, { "value", Provider.map }, { "inline", true } });
             arrFields.Add(new JObject { { "name", "Date" }, { "value", DateTime.UtcNow.ToString() }, { "inline", true } });
             arrFields.Add(new JObject { { "name", "Reason" }, { "value", reason }, { "inline", false } });

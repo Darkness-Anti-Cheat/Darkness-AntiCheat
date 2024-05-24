@@ -4,5 +4,7 @@ obj/
 bin/
 DAC/bin/
 DAC/obj/
+DAC/obj
+DAC/bin
 publish/netstandard2.1/
 publish/Release/

@@ -1,4 +1,5 @@
 using Darkness_Anti_Cheat.components;
+using Rocket.API.Collections;
 using Rocket.Core.Plugins;
 using Rocket.Unturned;
 using Rocket.Unturned.Events;
@@ -17,8 +18,13 @@ namespace DAC
 
         public void AutoAnnouncement()
         {
-            ChatManager.serverSendMessage("<color=#2391DE>[DAC]</color> This server is protected by DAC".Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.SAY, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
+            ChatManager.serverSendMessage(Translate("AutoAnnouncement").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.SAY, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
         }
+
+        public override TranslationList DefaultTranslations => new TranslationList()
+        {
+           { "AutoAnnouncement", "<color=#2391DE>[DAC]</color> This server is protected by DAC" },
+        };
 
         protected override void Load()
         {
@@ -45,7 +51,11 @@ namespace DAC
                 ThreadPool.QueueUserWorkItem((yes) => Darkness_Anti_Cheat_Events.clumsy_detect_fake_lag());
             }
 
-            UnturnedPlayerEvents.OnPlayerDeath += OnPlayerDeath; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] onPlayerDeath event loaded", ConsoleColor.DarkCyan);
+            if (Configuration.Instance.abuse_detection)
+            {
+                UnturnedPlayerEvents.OnPlayerDeath += OnPlayerDeath; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] onPlayerDeath event loaded", ConsoleColor.DarkCyan);
+            }
+
             UnturnedPlayerEvents.OnPlayerChatted += OnPlayerChatted; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerChatted event loaded", ConsoleColor.DarkCyan);
             DamageTool.playerDamaged -= OnPlayerDamage; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerDamage event loaded", ConsoleColor.DarkCyan);
             U.Events.OnPlayerConnected += OnPlayerConnect; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerConnect event loaded", ConsoleColor.DarkCyan);
@@ -58,7 +68,12 @@ namespace DAC
             // Unload all events
             U.Events.OnPlayerConnected -= OnPlayerConnect; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerConnect event unloaded", ConsoleColor.DarkCyan);
             UnturnedPlayerEvents.OnPlayerDeath -= OnPlayerDeath; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] onPlayerDeath event unloaded", ConsoleColor.DarkCyan);
-            UnturnedPlayerEvents.OnPlayerChatted -= OnPlayerChatted; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerChatted event unloaded", ConsoleColor.DarkCyan);
+            
+            if (Configuration.Instance.abuse_detection)
+            {
+                UnturnedPlayerEvents.OnPlayerChatted -= OnPlayerChatted; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerChatted event unloaded", ConsoleColor.DarkCyan);
+            }
+
             DamageTool.playerDamaged -= OnPlayerDamage; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerDamage event unloaded", ConsoleColor.DarkCyan);
 
             CancelInvoke("AutoAnnouncement");
@@ -66,8 +81,7 @@ namespace DAC
             Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] unloaded", ConsoleColor.DarkYellow);
         }
 
-        private void OnPlayerChatted(UnturnedPlayer player, ref Color color, string message, SDG.Unturned.EChatMode chatMode, ref bool cancel) => Darkness_Anti_Cheat_Events.chat_log(player, color, message, chatMode, cancel);
-
+        private void OnPlayerChatted(UnturnedPlayer player, ref Color color, string message, SDG.Unturned.EChatMode chatMode, ref bool cancel) => Darkness_Anti_Cheat_Events.chat_log(player, message);
         private void OnPlayerConnect(UnturnedPlayer player) { player.Player.GetComponent<PlayerComponent>().Kills = 0; player.Player.GetComponent<PlayerComponent>().Deaths = 0; player.Player.GetComponent<PlayerComponent>().Headshots = 0; }
 
         private void OnPlayerDeath(UnturnedPlayer player, EDeathCause cause, ELimb limb, CSteamID killer) => Darkness_Anti_Cheat_Events.auto_report(UnturnedPlayer.FromCSteamID(killer), player, limb);
