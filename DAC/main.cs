@@ -21,6 +21,7 @@ namespace DAC
             ChatManager.serverSendMessage(Translate("AutoAnnouncement").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.SAY, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
         }
 
+        // Translations
         public override TranslationList DefaultTranslations => new TranslationList()
         {
            { "AutoAnnouncement", "<color=#2391DE>[DAC]</color> This server is protected by DAC" },
