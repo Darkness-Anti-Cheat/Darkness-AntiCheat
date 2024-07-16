@@ -57,8 +57,8 @@ namespace DAC
             UnturnedPlayer Killer = UnturnedPlayer.FromCSteamID(killer);
 
             // Detect if player has too much ping, just return
-            if (!Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping_high && Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping <= Killer.Ping) return;
-
+            //if (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping_high && Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping >= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer)) return;
+            UnturnedChat.Say($"{Killer.Ping}");
             RaycastHit hit;
 
             if (cause == EDeathCause.GUN)
@@ -68,42 +68,97 @@ namespace DAC
                 if (asset is ItemGunAsset gunAsset)
                 {
 
-                    // Silent aimbot detection through the walls
+                    // Silent aimbot detection through the walls, if player is looking at wall, structure or anything and not a player, and still hitting the player, is using cheats
+                    // Only with weapons, not with grenades or rocket launchers
                     if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.BARRICADE | RayMasks.STRUCTURE | RayMasks.VEHICLE | RayMasks.RESOURCE))
                     {
-                        player.GetComponent<PlayerComponent>().RateAim++;
-
-
-                        if (player.GetComponent<PlayerComponent>().RateAim == 10)
+                        if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.PLAYER))
                         {
-                            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been kicked for (<color=red>Silent-aimbot</color>)").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
+                            Killer.GetComponent<PlayerComponent>().RateAim++;
 
-                            Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Silent-aimbot)", false, null, "FF0000"); // lets take a screenshot and generate auto report
-                            Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+                            if (Killer.GetComponent<PlayerComponent>().RateAim == Darkness_Anti_Cheat.Instance.Configuration.Instance.aimbot_detection_rate) // Ratelimit, cause can do false positive
+                            {
+                                if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
+                                    ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been kicked for '<color=red>Silent-aimbot</color>'").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
 
-                            player.GetComponent<PlayerComponent>().RateAim = 0;
+                                Killer.GetComponent<PlayerComponent>().RateAim = 0;
 
-                            // Kick user if shot through the walls
-                            Killer.Kick("[DAC] You has been kicked for (Silent aimbot)");
+                                ThreadPool.QueueUserWorkItem((yes) =>
+                                {
+                                    Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Silent-aimbot)", false, null); // lets take a screenshot and generate auto report
+                                    Darkness_Anti_Cheat_Functions.webhook_logs(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, "(Silent Aim)");
+                                });
+
+                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook));
+                            }
                         }
                     }
+                    
                 }
             }
             else
             {
                 // Cannot detect Melee, i'm do lazy do it xd
                 // Range changer hack detection, max of punch distance is 2, but i put more cause the lag compensation can fail
-                if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, 2.5f, RayMasks.PLAYER_INTERACT | RayMasks.PLAYER) && cause == EDeathCause.PUNCH)
+                if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, 15, RayMasks.PLAYER))
                 {
-                    if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                        ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been kicked for (<color=red>Punch distance hack</color>)").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
+                    switch(cause)
+                    {
+                        case EDeathCause.PUNCH:
+                            if (Darkness_Anti_Cheat_Functions.CalculateDistance(Killer, BeingKilled) >= 2.5f) // If distance equals or high than, he is using punch hack...
+                            {
+                                Killer.GetComponent<PlayerComponent>().RatePunch++;
 
-                    Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Punch Distance Hack)", false, null, "FF0000"); // lets take a screenshot and generate auto report
-                    Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+                                if (Killer.GetComponent<PlayerComponent>().RatePunch == Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_distance_rate) // Ratelimit, cause can do false positive
+                                {
+                                    if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
+                                        ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been kicked for '<color=red>Punch distance hack</color>'").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
 
-                    // Kick user
-                    Killer.Kick("[DAC] You has been kicked for (Punch distance hack)");
+                                    Killer.GetComponent<PlayerComponent>().RatePunch = 0;
+
+                                    canDamage = false;
+
+                                    ThreadPool.QueueUserWorkItem((yes) =>
+                                    {
+                                        Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Punch Distance Hack)", false, null); // lets take a screenshot and generate auto report
+                                        Darkness_Anti_Cheat_Functions.webhook_logs(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, "(Punch Distance Hack)");
+                                    });
+
+                                    Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+                                }
+                            }
+                            break;
+                        case EDeathCause.MELEE:
+                            var asset = UnturnedPlayer.FromCSteamID(killer).Player.equipment.asset;
+                            if (asset is ItemMeleeAsset gunAsset)
+                            {
+                                if (Darkness_Anti_Cheat_Functions.CalculateDistance(Killer, BeingKilled) >= gunAsset.range) // If distance equals or high than, he is using melee hack...
+                                {
+                                    Killer.GetComponent<PlayerComponent>().RatePunch++;
+
+                                    if (Killer.GetComponent<PlayerComponent>().RatePunch == Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_distance_rate) // Ratelimit, cause can do false positive
+                                    {
+                                        if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
+                                            ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been kicked for '<color=red>Melee distance hack</color>'").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
+
+                                        Killer.GetComponent<PlayerComponent>().RatePunch = 0;
+
+                                        canDamage = false;
+
+                                        ThreadPool.QueueUserWorkItem((yes) =>
+                                        {
+                                            Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Melee Distance Hack)", false, null); // lets take a screenshot and generate auto report
+                                            Darkness_Anti_Cheat_Functions.webhook_logs(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, "(Melee Distance Hack)");
+                                        });
+
+                                        Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+
+
+                                    }
+                                }
+                            }
+                            break;
+                    }
                 }
             }
         }
@@ -128,15 +183,12 @@ namespace DAC
                             if (!Physics.Raycast(unturnedPlayer.Position, Vector3.down, out raycastHit, 2048f, RayMasks.RESOURCE | RayMasks.LARGE | RayMasks.MEDIUM | RayMasks.SMALL | RayMasks.GROUND | RayMasks.GROUND2))
                             {
                                 Darkness_Anti_Cheat_Functions.send_report(null, unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(No-clip)"); // lets take a screenshot and generate auto report
-                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
-
                                 Darkness_Anti_Cheat_Functions.webhook_logs(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, "(No-clip)");
 
                                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been kicked for (<color=red>No-clip</color>)", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
+                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been kicked for '<color=red>No-clip</color>'", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
 
-                                // No clip detection
-                                unturnedPlayer.Kick("[DAC] You has been kicked for (No-clip)");
+                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
                             }
                         }
                         unturnedPlayer = null;
@@ -165,15 +217,13 @@ namespace DAC
                             if (unturnedPlayer.Player.input.IsUnderFakeLagPenalty)
                             {
                                 Darkness_Anti_Cheat_Functions.send_report(null, unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Fake-Lag)"); // lets take a screenshot and generate auto report
-                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
 
                                 Darkness_Anti_Cheat_Functions.webhook_logs(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, "(Fake-Lag)");
 
                                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been kicked for (<color=red>Fake-Lag/color>)", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
+                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been kicked for '<color=red>Fake-Lag/color>'", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
 
-                                // Fake-Lag detection
-                                unturnedPlayer.Kick("[DAC] You has been kicked for (Fake-Lag)");
+                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
                             }
                         }
                         unturnedPlayer = null;
@@ -201,15 +251,14 @@ namespace DAC
                             if(unturnedPlayer.Player.look.isOrbiting || unturnedPlayer.Player.look.isTracking)
                             {
                                 Darkness_Anti_Cheat_Functions.send_report(null, unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, "(Free-Cam)"); // lets take a screenshot and generate auto report
-                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
 
                                 Darkness_Anti_Cheat_Functions.webhook_logs(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, "(Free-Cam)");
 
                                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been kicked for (<color=red>Free-Cam/color>)", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
+                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been kicked for '<color=red>Free-Cam/color>'", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
 
-                                // Free-Cam detection
-                                unturnedPlayer.Kick("[DAC] You has been kicked for (Free-Cam)");
+
+                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
                             }
                         }
                         unturnedPlayer = null;
@@ -233,8 +282,12 @@ namespace DAC
                 if (Entry.Equals(default(AbuseCommands)))
                     return;
 
-                Darkness_Anti_Cheat_Functions.send_report(null, player, Darkness_Anti_Cheat.Instance.Configuration.Instance.abuse_player_webhook, "Admin abuse logger", true, message, "FF0000"); // lets take a screenshot and generate auto report
-                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(player, Darkness_Anti_Cheat.Instance.Configuration.Instance.abuse_player_webhook)); // lets take a screenshot and generate auto report
+                ThreadPool.QueueUserWorkItem((yes) =>
+                {
+                    Darkness_Anti_Cheat_Functions.send_report(null, player, Darkness_Anti_Cheat.Instance.Configuration.Instance.abuse_player_webhook, "Admin abuse logger", true, message, "FF0000"); // lets take a screenshot and generate auto report
+                });
+
+                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(player, Darkness_Anti_Cheat.Instance.Configuration.Instance.abuse_player_webhook));
             }
         }
 
@@ -258,12 +311,17 @@ namespace DAC
                 if (killer.Player.GetComponent<PlayerComponent>().Kills >= Darkness_Anti_Cheat.Instance.Configuration.Instance.player_kills_alert && 
                     (killer.Player.GetComponent<PlayerComponent>().Headshots / (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_kills_alert / 2)) * 100 == 100)
                 {
-                    Darkness_Anti_Cheat_Functions.send_report(null, killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook); // lets take a screenshot and generate auto report
-                    Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+                    ThreadPool.QueueUserWorkItem((yes) =>
+                    {
+                        Darkness_Anti_Cheat_Functions.send_report(null, killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook); // lets take a screenshot and generate auto report
+                    });
+                    
 
                     // reset the killer kills
                     killer.Player.GetComponent<PlayerComponent>().Kills = 0;
                     killer.Player.GetComponent<PlayerComponent>().Headshots = 0;
+
+                    Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook));
                 }
             }
         }

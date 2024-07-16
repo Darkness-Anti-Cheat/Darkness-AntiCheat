@@ -1,5 +1,6 @@
 using Darkness_Anti_Cheat.components;
 using Newtonsoft.Json.Linq;
+using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using Steamworks;
@@ -36,6 +37,21 @@ namespace DAC
             CodeHotkey2 = 11,
             CodeHotkey3 = 12,
             CodeHotkey4 = 13
+        }
+
+        public static float CalculateDistance(UnturnedPlayer killer, UnturnedPlayer victim)
+        {
+            Vector3 killerPosition = killer.Player.transform.position;
+            Vector3 victimPosition = victim.Player.transform.position;
+
+            float distance = Vector3.Distance(killerPosition, victimPosition);
+
+            return distance;
+        }
+
+        public static int GetPlayerPing(UnturnedPlayer killer)
+        {
+            return (int)killer.Ping * 1000;
         }
 
         public static bool IsPlayerVisible(UnturnedPlayer player1, UnturnedPlayer player2)
@@ -103,17 +119,14 @@ namespace DAC
             JObject objAuthor = new JObject();
 
             var Timestamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
-
             objAuthor.Add("name", to_player.SteamPlayer().player.name);
             objAuthor.Add("url", "http://steamcommunity.com/profiles/" + to_player.CSteamID);
-            objAuthor.Add("icon_url", UnturnedPlayer.FromSteamPlayer(to_player.SteamPlayer()).SteamProfile.AvatarFull.AbsoluteUri ?? "");
             objEmbed.Add("title", "Logs Darkness Anti Cheat");
             objEmbed.Add("color", int.Parse(color, NumberStyles.HexNumber));
             objEmbed.Add("author", objAuthor);
 
             JArray arrFields = new JArray();
             arrFields.Add(new JObject { { "name", "From Player" }, { "value", player == null ? "System" : $"[{player.DisplayName}](http://steamcommunity.com/profiles/" + player.CSteamID + ")" }, { "inline", true } });
-
             if(!admin)
             {
                 arrFields.Add(new JObject { { "name", "Kills" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Kills }, { "inline", true } });
@@ -159,7 +172,7 @@ namespace DAC
 
             objAuthor.Add("name", player.SteamPlayer().player.name);
             objAuthor.Add("url", "http://steamcommunity.com/profiles/" + player.CSteamID);
-            objAuthor.Add("icon_url", UnturnedPlayer.FromSteamPlayer(player.SteamPlayer()).SteamProfile.AvatarFull.AbsoluteUri);
+            //objAuthor.Add("icon_url", UnturnedPlayer.FromSteamPlayer(player.SteamPlayer()).SteamProfile.AvatarFull.AbsoluteUri);
             objEmbed.Add("title", $"Kicked for {reason}");
             objEmbed.Add("color", int.Parse("0085EA", NumberStyles.HexNumber));
             objEmbed.Add("author", objAuthor);

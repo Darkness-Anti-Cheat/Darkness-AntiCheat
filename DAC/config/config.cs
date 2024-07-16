@@ -54,6 +54,10 @@ namespace DAC
 
         public string logs;
 
+        public int aimbot_detection_rate;
+
+        public int punch_distance_rate;
+
         [XmlArray("CommandEntries"), XmlArrayItem("CommandEntry")]
         public AbuseCommands[] Entries;
 
@@ -86,6 +90,8 @@ namespace DAC
             anti_free_cam = true;
             abuse_detection = true;
             aimbot_detection = true;
+            aimbot_detection_rate = 3;
+            punch_distance_rate = 3;
             noclip_detection = true;
             global_chat = true;
         }

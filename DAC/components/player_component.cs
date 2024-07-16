@@ -14,5 +14,6 @@ namespace Darkness_Anti_Cheat.components
         public int Headshots { get; set; }
         public int Rate { get; set; } // Using if detect several times, but we only using this in anti aim section
         public int RateAim { get; set; }
+        public int RatePunch { get; set; }
     }
 }
