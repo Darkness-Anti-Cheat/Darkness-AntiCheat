@@ -39,6 +39,12 @@ namespace DAC
             CodeHotkey4 = 13
         }
 
+        public static void Log(string message, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine($"[Darkness_Anti_Cheat] {message}");
+        }
+
         public static float CalculateDistance(UnturnedPlayer killer, UnturnedPlayer victim)
         {
             Vector3 killerPosition = killer.Player.transform.position;
@@ -49,11 +55,12 @@ namespace DAC
             return distance;
         }
 
-        public static int GetPlayerPing(UnturnedPlayer killer)
+        public static float GetPlayerPing(UnturnedPlayer killer)
         {
-            return (int)killer.Ping * 1000;
+            return (float)killer.Ping * 1000;
         }
 
+        [Obsolete]
         public static bool IsPlayerVisible(UnturnedPlayer player1, UnturnedPlayer player2)
         {
             RaycastHit hit;
@@ -64,6 +71,7 @@ namespace DAC
             return false;
         }
 
+        [Obsolete]
         public UnturnedPlayer FindClosestPlayer(UnturnedPlayer targetPlayer)
         {
             UnturnedPlayer closestPlayer = null;
@@ -172,7 +180,6 @@ namespace DAC
 
             objAuthor.Add("name", player.SteamPlayer().player.name);
             objAuthor.Add("url", "http://steamcommunity.com/profiles/" + player.CSteamID);
-            //objAuthor.Add("icon_url", UnturnedPlayer.FromSteamPlayer(player.SteamPlayer()).SteamProfile.AvatarFull.AbsoluteUri);
             objEmbed.Add("title", $"Kicked for {reason}");
             objEmbed.Add("color", int.Parse("0085EA", NumberStyles.HexNumber));
             objEmbed.Add("author", objAuthor);
@@ -191,6 +198,20 @@ namespace DAC
             }
 
             return obj;
+        }
+        // we use this function, cause the screenshots can do some delay to get it
+        public static IEnumerator execute(UnturnedPlayer player, string reason)
+        {
+            yield return new WaitForSeconds(5.0f);
+            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.ban)
+            {
+                player.Ban($"[DAC] You have been banned for using ({reason})", Darkness_Anti_Cheat.Instance.Configuration.Instance.ban_seconds);
+            }
+
+            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.kick)
+            {
+                player.Kick($"[DAC] You have been kicked for using ({reason})");
+            }
         }
 
         public static IEnumerator screenshot(UnturnedPlayer player, string uri)
