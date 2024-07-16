@@ -106,7 +106,7 @@ namespace DAC
 
             objAuthor.Add("name", to_player.SteamPlayer().player.name);
             objAuthor.Add("url", "http://steamcommunity.com/profiles/" + to_player.CSteamID);
-            objAuthor.Add("icon_url", UnturnedPlayer.FromSteamPlayer(to_player.SteamPlayer()).SteamProfile.AvatarFull.AbsoluteUri);
+            objAuthor.Add("icon_url", UnturnedPlayer.FromSteamPlayer(to_player.SteamPlayer()).SteamProfile.AvatarFull.AbsoluteUri ?? "");
             objEmbed.Add("title", "Logs Darkness Anti Cheat");
             objEmbed.Add("color", int.Parse(color, NumberStyles.HexNumber));
             objEmbed.Add("author", objAuthor);
@@ -116,7 +116,6 @@ namespace DAC
 
             if(!admin)
             {
-                arrFields.Add(new JObject { { "name", "MS" }, { "value", to_player.Ping }, { "inline", true } });
                 arrFields.Add(new JObject { { "name", "Kills" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Kills }, { "inline", true } });
                 arrFields.Add(new JObject { { "name", "Deaths" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Deaths }, { "inline", true } });
                 arrFields.Add(new JObject { { "name", "Headshots" }, { "value", to_player.Player.GetComponent<PlayerComponent>().Headshots }, { "inline", true } });

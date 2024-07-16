@@ -58,7 +58,7 @@ namespace DAC
             }
 
             UnturnedPlayerEvents.OnPlayerChatted += OnPlayerChatted; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerChatted event loaded", ConsoleColor.DarkCyan);
-            DamageTool.playerDamaged -= OnPlayerDamage; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerDamage event loaded", ConsoleColor.DarkCyan);
+            DamageTool.playerDamaged += OnPlayerDamage; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerDamage event loaded", ConsoleColor.DarkCyan);
             U.Events.OnPlayerConnected += OnPlayerConnect; Rocket.Core.Logging.Logger.Log("[Darkness_Anti_Cheat] OnPlayerConnect event loaded", ConsoleColor.DarkCyan);
 
             InvokeRepeating("AutoAnnouncement", 350, 350);

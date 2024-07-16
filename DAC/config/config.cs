@@ -38,6 +38,8 @@ namespace DAC
 
         public int player_ping;
 
+        public int player_kills_alert;
+
         //public bool proxy_detection;
 
         //public bool trust_detection;
@@ -80,6 +82,7 @@ namespace DAC
             player_ping_high = true;
             clumsy_detect_fake_lag = true;
             anti_aim_detection = true;
+            player_kills_alert = 20;
             anti_free_cam = true;
             abuse_detection = true;
             aimbot_detection = true;
