@@ -36,30 +36,17 @@ namespace DAC
             Darkness_Anti_Cheat_Functions.Log("(WARNING) This is not an anti cheat at all, but a tool that improves the server to prevent people with cheats.", ConsoleColor.Green);
             Darkness_Anti_Cheat_Functions.Log("(WARNING) ¡This plugin require a discord Server!", ConsoleColor.DarkYellow);
 
-            if (Configuration.Instance.noclip_detection)
-            {
-                Darkness_Anti_Cheat_Functions.Log("no_clip event loaded", ConsoleColor.DarkCyan);
-                ThreadPool.QueueUserWorkItem((yes) => StartCoroutine(Darkness_Anti_Cheat_Events.no_clip()));
-            }
 
-            if (Configuration.Instance.anti_free_cam)
-            {
-                Darkness_Anti_Cheat_Functions.Log("anti_free_cam event loaded", ConsoleColor.DarkCyan);
-                ThreadPool.QueueUserWorkItem((yes) => StartCoroutine(Darkness_Anti_Cheat_Events.anti_free_cam()));
-            }
-
-            if (Configuration.Instance.clumsy_detect_fake_lag)
-            {
-                Darkness_Anti_Cheat_Functions.Log("clumsy_detect_fake_lag event loaded", ConsoleColor.DarkCyan);
-                ThreadPool.QueueUserWorkItem((yes) => StartCoroutine(Darkness_Anti_Cheat_Events.clumsy_detect_fake_lag()));
-            }
+            if (Configuration.Instance.noclip_detection) Darkness_Anti_Cheat_Functions.Log("no_clip event loaded", ConsoleColor.DarkCyan);
+            if (Configuration.Instance.anti_free_cam) Darkness_Anti_Cheat_Functions.Log("anti_free_cam event loaded", ConsoleColor.DarkCyan);
+            if (Configuration.Instance.clumsy_detect_fake_lag) Darkness_Anti_Cheat_Functions.Log("clumsy_detect_fake_lag event loaded", ConsoleColor.DarkCyan);
+            ThreadPool.QueueUserWorkItem((yes) => StartCoroutine(Darkness_Anti_Cheat_Events.get_players_detection()));
 
             if (Configuration.Instance.abuse_detection)
             {
                 Darkness_Anti_Cheat_Functions.Log("onPlayerDeath event loaded", ConsoleColor.DarkCyan);
                 UnturnedPlayerEvents.OnPlayerDeath += OnPlayerDeath;
             }
-
 
             UnturnedPlayerEvents.OnPlayerChatted += OnPlayerChatted; Darkness_Anti_Cheat_Functions.Log("OnPlayerChatted event loaded", ConsoleColor.DarkCyan);
             DamageTool.playerDamaged += OnPlayerDamage; Darkness_Anti_Cheat_Functions.Log("OnPlayerDamage event loaded", ConsoleColor.DarkCyan);
@@ -102,7 +89,7 @@ namespace DAC
         private void OnPlayerInventoryAdded(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P) => Darkness_Anti_Cheat_Events.take_items_through_walls(player, inventoryGroup, inventoryIndex, P);
         private void OnPlayerChatted(UnturnedPlayer player, ref Color color, string message, SDG.Unturned.EChatMode chatMode, ref bool cancel) => Darkness_Anti_Cheat_Events.chat_log(player, message);
         private void OnPlayerConnect(UnturnedPlayer player) { player.Player.GetComponent<PlayerComponent>().Kills = 0; player.Player.GetComponent<PlayerComponent>().Deaths = 0; player.Player.GetComponent<PlayerComponent>().Headshots = 0; }
-        private void OnPlayerDeath(UnturnedPlayer player, EDeathCause cause, ELimb limb, CSteamID killer) => Darkness_Anti_Cheat_Events.auto_report(UnturnedPlayer.FromCSteamID(killer), player, limb);
+        private void OnPlayerDeath(UnturnedPlayer player, EDeathCause cause, ELimb limb, CSteamID killer) => Darkness_Anti_Cheat_Events.auto_report(killer, player, limb);
         private void OnPlayerDamage(Player player, ref EDeathCause cause, ref ELimb limb, ref CSteamID killer, ref Vector3 direction, ref float damage, ref float times, ref bool canDamage) => Darkness_Anti_Cheat_Events.event_aimbot(player, cause, limb, killer, direction, damage, times, canDamage);
     }
 }
