@@ -1,3 +1,5 @@
+[![Join in our discord](https://discordapp.com/api/guilds/869187450159923221/widget.png)](https://discord.gg/wWtjUcvXQp)
+[![Download latest release here](https://img.shields.io/badge/download-latest_release-brightgreen.svg?maxAge=2592000)](https://github.com/Darkness-Anti-Cheat/Darkness-AntiCheat/releases/)
 <div align="center">
     <h1>Server Side Anti Cheat</h1>
     <img height="150px;" src="https://darknesscommunity.club/assets/plugins/images/server/anticheat.png"></img>
@@ -9,14 +11,17 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
 <div align="center">
     <img height="500px;" src=".github\image-examples\example.png"></img>
 </div>
+<div align="center">
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/hzJNutQ1Lms?si=FkRRyAlj_WwEONwR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
 
 <h1>What can detect?</h1>
 
-- Silent-Aim
+- Silent-Aim <b>(Aimbot, Calculate KDA Players with auto report system, check for punch, melee distance override)</b>
 - Anti-Aim
 - No-Clip
-- Fake-Lag (Clumsy or other programs)
-- Admin Abuse
+- Fake-Lag <b>(Clumsy or other programs) (beta feature)</b>
+- Admin Abuse <b>(Send automatically commands that type administrators)</b>
 - Anti-Free Cam
 
 <h1>Installation and requirements</h1>
@@ -24,23 +29,45 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
 - rocketmod
 - netstandard
 
+<h1>Permissions & Commands</h1>
+
+- /report <b>(player)</b> <b>(reason)</b> - Permission: report
+- Permission: dac_bypass <b>(Bypass)</b>
+
 <h3>Important things</h3>
 
 ```
-    <global_chat>true</global_chat> # Send message to global chat, when someone gets banned
-    <aimbot_detection>true</aimbot_detection>
-    <noclip_detection>true</noclip_detection>
-    <abuse_detection>true</abuse_detection>
-    <auto_reports_webhook>--DISCORD-WEBHOOK--</auto_reports_webhook>
-    <report_player_webhook>--DISCORD-WEBHOOK--</report_player_webhook>
-    <abuse_player_webhook>--DISCORD-WEBHOOK--</abuse_player_webhook>
-    <logs>--DISCORD-WEBHOOK--</logs>
-    <CommandEntries> # Commands you want to detect, admin abuse
-        <CommandEntry name="god" aliases="gd,g" />
-        <CommandEntry name="vanish" aliases="" />
-        <CommandEntry name="kill" aliases="" />
-        <CommandEntry name="wreck" aliases="" />
-    </CommandEntries>
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <abuse_detection>true</abuse_detection>
+  <auto_reports_webhook></auto_reports_webhook> <--- WEBHOOK DISCORD
+  <report_player_webhook></report_player_webhook> <--- WEBHOOK DISCORD
+  <abuse_player_webhook></abuse_player_webhook> <--- WEBHOOK DISCORD
+  <logs></logs> <--- WEBHOOK DISCORD
+  <aimbot_detection>true</aimbot_detection>
+  <aimbot_detection_rate>3</aimbot_detection_rate> <--- HOW MANY TIMES NEED FOR BAN, KICK
+  <player_kills_alert>20</player_kills_alert> <--- REPORT A PLAYER WITH X KILLS, JUST A REPORT TO DISCORD, NOT BAN OR KICK
+  <punch_override_distance_detection>true</punch_override_distance_detection>
+  <punch_distance_rate>3</punch_distance_rate> <--- HOW MANY TIMES NEED FOR BAN, KICK
+  <noclip_detection>true</noclip_detection>
+  <noclip_detection_rate>3</noclip_detection_rate> <--- HOW MANY TIMES NEED FOR BAN, KICK
+  <anti_free_cam>true</anti_free_cam>
+  <anti_aim_detection>true</anti_aim_detection>
+  <player_ping_high>true</player_ping_high>
+  <clumsy_detect_fake_lag>true</clumsy_detect_fake_lag>
+  <player_ping>180</player_ping>
+  <take_items_through_walls_detection>true</take_items_through_walls_detection> <--- NOT WORKING
+  <kick>true</kick> <--- KICK THE USER
+  <ban>false</ban> <--- BAN THE USER
+  <ban_seconds>65000</ban_seconds>
+  <global_chat>true</global_chat> <--- GLOBAL CHAT WHEN A PLAYER GET PUNISHED
+  <CommandEntries>
+    <CommandEntry name="god" aliases="" />  <--- COMMANDS AND ALIASES FOR GETTING ADMIN ABUSE REPORTS
+    <CommandEntry name="vanish" aliases="" />
+    <CommandEntry name="kill" aliases="" />
+    <CommandEntry name="wreck" aliases="" />
+  </CommandEntries>
+</Configuration>
 ```
 
 ## License
