@@ -12,8 +12,10 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
     <img height="500px;" src=".github\image-examples\example.png"></img>
 </div>
 <div align="center">
-    <p>Some proofs of testings</p>
+    <p>Some proofs of testings with real Silent-Aimbot</p>
     https://www.youtube.com/embed/hzJNutQ1Lms?si=FkRRyAlj_WwEONwR
+    <p>Detecting Melee, Punch override distance</p>
+    https://www.youtube.com/watch?v=wo3vEtpbGfU
 </div>
 
 <h1>What can detect?</h1>
@@ -56,7 +58,7 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
   <anti_aim_detection>true</anti_aim_detection>
   <player_ping_high>true</player_ping_high>
   <clumsy_detect_fake_lag>true</clumsy_detect_fake_lag>
-  <player_ping>180</player_ping>
+  <player_ping>180</player_ping> <-- If player has that ping, aimbot and other detections will stop, due can do false positives
   <take_items_through_walls_detection>true</take_items_through_walls_detection> <--- NOT WORKING
   <kick>true</kick> <--- KICK THE USER
   <ban>false</ban> <--- BAN THE USER

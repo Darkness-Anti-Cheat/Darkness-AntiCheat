@@ -59,9 +59,11 @@ namespace DAC
             var reason = "";
 
             // Detect if player has too much ping, just return
-            //if (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping_high && 200 >= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer)) return;
-
-            UnturnedChat.Say($"{200 >= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer)}");
+            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping_high)
+            {
+                if (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping <= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer))
+                    return;
+            }
 
             RaycastHit hit;
 
