@@ -19,7 +19,7 @@ namespace DAC
         // check trust factor
         public static void trust_factor() { }
 
-        // check aimbots
+        // check aimbots for players
         public static void event_aimbot(Player player, EDeathCause cause, ELimb limb, CSteamID killer, Vector3 direction, float damage, float times, bool canDamage)
         {
             if (cause != EDeathCause.GUN && cause != EDeathCause.PUNCH && cause != EDeathCause.MELEE) return;
@@ -53,14 +53,15 @@ namespace DAC
                 }
             }*/
 
-
             UnturnedPlayer BeingKilled = UnturnedPlayer.FromPlayer(player);
             UnturnedPlayer Killer = UnturnedPlayer.FromCSteamID(killer);
 
             var reason = "";
 
             // Detect if player has too much ping, just return
-            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping_high && 200.00f >= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer)) return;
+            //if (Darkness_Anti_Cheat.Instance.Configuration.Instance.player_ping_high && 200 >= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer)) return;
+
+            UnturnedChat.Say($"{200 >= Darkness_Anti_Cheat_Functions.GetPlayerPing(Killer)}");
 
             RaycastHit hit;
 
