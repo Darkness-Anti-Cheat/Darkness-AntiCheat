@@ -20,8 +20,8 @@ jobs:
       - name: Check commit message
         id: check_commit_message
         run: |
-          if [[ "${{ steps.get_commit_message.outputs.message }}" != *"Release name: Build and Release"* ]]; then
-            echo "Commit message does not contain 'Release name: Build and Release'. Skipping the job."
+          if [[ "${{ steps.get_commit_message.outputs.message }}" != *"Release"* ]]; then
+            echo "Commit message does not contain 'Release'. Skipping the job."
             exit 1
           fi
 
