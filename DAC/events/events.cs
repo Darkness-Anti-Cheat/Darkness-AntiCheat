@@ -55,7 +55,7 @@ namespace DAC
 
             UnturnedPlayer BeingKilled = UnturnedPlayer.FromPlayer(player);
             UnturnedPlayer Killer = UnturnedPlayer.FromCSteamID(killer);
-
+            RocketPlayer rocketPlayer = new RocketPlayer(Killer.Id);
             var reason = "";
 
             // Detect if player has too much ping, just return
@@ -66,68 +66,32 @@ namespace DAC
             }
 
             RaycastHit hit;
-
-            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.aimbot_detection && cause == EDeathCause.GUN)
+            if (!Killer.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
             {
-                // Getting range of weapon
-                var asset = UnturnedPlayer.FromCSteamID(killer).Player.equipment.asset;
-                if (asset is ItemGunAsset gunAsset)
+                if (Darkness_Anti_Cheat.Instance.Configuration.Instance.aimbot_detection && cause == EDeathCause.GUN)
                 {
-
-                    // Silent aimbot detection through the walls, if player is looking at wall, structure or anything and not a player, and still hitting the player, is using cheats
-                    // Only with weapons, not with grenades or rocket launchers
-                    if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.BARRICADE | RayMasks.STRUCTURE | RayMasks.VEHICLE | RayMasks.RESOURCE))
+                    // Getting range of weapon
+                    var asset = UnturnedPlayer.FromCSteamID(killer).Player.equipment.asset;
+                    if (asset is ItemGunAsset gunAsset)
                     {
-                        if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.PLAYER))
+
+                        // Silent aimbot detection through the walls, if player is looking at wall, structure or anything and not a player, and still hitting the player, is using cheats
+                        // Only with weapons, not with grenades or rocket launchers
+                        if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.BARRICADE | RayMasks.STRUCTURE | RayMasks.VEHICLE | RayMasks.RESOURCE))
                         {
-                            Killer.GetComponent<PlayerComponent>().RateAim++;
-
-                            if (Killer.GetComponent<PlayerComponent>().RateAim == Darkness_Anti_Cheat.Instance.Configuration.Instance.aimbot_detection_rate) // Ratelimit, cause can do false positive
+                            // if player is visible, just don't do the detection (need to test it with this, i didn't test it with a real cheat)
+                            if (!Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.PLAYER))
                             {
-                                reason = "Silent-Aimbot";
+                                Killer.GetComponent<PlayerComponent>().RateAim++;
 
-                                if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been punished for '<color=red>{reason}</color>'").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
-
-                                Killer.GetComponent<PlayerComponent>().RateAim = 0;
-
-                                ThreadPool.QueueUserWorkItem((yes) =>
+                                if (Killer.GetComponent<PlayerComponent>().RateAim == Darkness_Anti_Cheat.Instance.Configuration.Instance.aimbot_detection_rate) // Ratelimit, cause can do false positive
                                 {
-                                    Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, $"({reason})", false, null); // lets take a screenshot and generate auto report
-                                    Darkness_Anti_Cheat_Functions.webhook_logs(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, $"({reason})");
-                                });
+                                    reason = "Silent-Aimbot";
 
-                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook));
-                                Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.execute(Killer, reason));
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            // Cannot detect Melee, i'm do lazy do it xd
-            // Range changer hack detection, max of punch distance is 2, but i put more cause the lag compensation can fail
-            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_override_distance_detection)
-            {
-                if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, 15f, RayMasks.PLAYER))
-                {
-                    switch (cause)
-                    {
-                        case EDeathCause.PUNCH:
-                            reason = "Punch Override Hack";
-                            if (Darkness_Anti_Cheat_Functions.CalculateDistance(Killer, BeingKilled) >= 2.5f) // If distance equals or high than, he is using punch hack...
-                            {
-                                Killer.GetComponent<PlayerComponent>().RatePunch++;
-
-                                if (Killer.GetComponent<PlayerComponent>().RatePunch == Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_distance_rate) // Ratelimit, cause can do false positive
-                                {
                                     if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
                                         ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been punished for '<color=red>{reason}</color>'").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
 
-                                    Killer.GetComponent<PlayerComponent>().RatePunch = 0;
-
-                                    canDamage = false;
+                                    Killer.GetComponent<PlayerComponent>().RateAim = 0;
 
                                     ThreadPool.QueueUserWorkItem((yes) =>
                                     {
@@ -135,17 +99,25 @@ namespace DAC
                                         Darkness_Anti_Cheat_Functions.webhook_logs(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, $"({reason})");
                                     });
 
-                                    Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+                                    Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook));
                                     Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.execute(Killer, reason));
                                 }
                             }
-                            break;
-                        case EDeathCause.MELEE:
-                            reason = "Melee Override Hack";
-                            var asset = UnturnedPlayer.FromCSteamID(killer).Player.equipment.asset;
-                            if (asset is ItemMeleeAsset gunAsset)
-                            {
-                                if (Darkness_Anti_Cheat_Functions.CalculateDistance(Killer, BeingKilled) >= gunAsset.range) // If distance equals or high than, he is using melee hack...
+                        }
+                    }
+                }
+
+                // Cannot detect Melee, i'm do lazy do it xd
+                // Range changer hack detection, max of punch distance is 2, but i put more cause the lag compensation can fail
+                if (Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_override_distance_detection)
+                {
+                    if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, 15f, RayMasks.PLAYER))
+                    {
+                        switch (cause)
+                        {
+                            case EDeathCause.PUNCH:
+                                reason = "Punch Override Hack";
+                                if (Darkness_Anti_Cheat_Functions.CalculateDistance(Killer, BeingKilled) >= 2.5f) // If distance equals or high than, he is using punch hack...
                                 {
                                     Killer.GetComponent<PlayerComponent>().RatePunch++;
 
@@ -168,8 +140,38 @@ namespace DAC
                                         Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.execute(Killer, reason));
                                     }
                                 }
-                            }
-                            break;
+                                break;
+                            case EDeathCause.MELEE:
+                                reason = "Melee Override Hack";
+                                var asset = UnturnedPlayer.FromCSteamID(killer).Player.equipment.asset;
+                                if (asset is ItemMeleeAsset gunAsset)
+                                {
+                                    if (Darkness_Anti_Cheat_Functions.CalculateDistance(Killer, BeingKilled) >= gunAsset.range) // If distance equals or high than, he is using melee hack...
+                                    {
+                                        Killer.GetComponent<PlayerComponent>().RatePunch++;
+
+                                        if (Killer.GetComponent<PlayerComponent>().RatePunch == Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_distance_rate) // Ratelimit, cause can do false positive
+                                        {
+                                            if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
+                                                ChatManager.serverSendMessage(($"<color=#2391DE>[DAC]</color> {Killer.DisplayName} has been punished for '<color=red>{reason}</color>'").Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png", true);
+
+                                            Killer.GetComponent<PlayerComponent>().RatePunch = 0;
+
+                                            canDamage = false;
+
+                                            ThreadPool.QueueUserWorkItem((yes) =>
+                                            {
+                                                Darkness_Anti_Cheat_Functions.send_report(null, Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, $"({reason})", false, null); // lets take a screenshot and generate auto report
+                                                Darkness_Anti_Cheat_Functions.webhook_logs(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, $"({reason})");
+                                            });
+
+                                            Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(Killer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
+                                            Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.execute(Killer, reason));
+                                        }
+                                    }
+                                }
+                                break;
+                        }
                     }
                 }
             }
@@ -188,6 +190,16 @@ namespace DAC
                     UnturnedPlayer unturnedPlayer = UnturnedPlayer.FromSteamPlayer(list);
                     RocketPlayer rocketPlayer = new RocketPlayer(unturnedPlayer.Id);
                     var reason = "";
+
+
+                    // Prevent cheaters to use his custom salvage time
+                    if (Darkness_Anti_Cheat.Instance.Configuration.Instance.anti_salvage_time_override)
+                    {
+                        if (!unturnedPlayer.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
+                        {
+                            unturnedPlayer.Player.interact.tellSalvageTimeOverride(Provider.server, 10f);
+                        }
+                    }
 
                     if (Darkness_Anti_Cheat.Instance.Configuration.Instance.noclip_detection)
                     {
@@ -237,6 +249,9 @@ namespace DAC
 
                         if (!unturnedPlayer.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
                         {
+                            // Prevent cheaters to use freemcam, anyways is this obsolete, but we use it
+                            unturnedPlayer.Player.look.tellFreecamAllowed(Provider.server, false);
+
                             // Player without permissions it's using freecam?
                             if (unturnedPlayer.Player.look.isOrbiting || unturnedPlayer.Player.look.isTracking)
                             {
@@ -254,7 +269,7 @@ namespace DAC
                         }
                     }
 
-                    //RaycastHit hit;
+                    // Just doing some test with vehicle no-clip, getting distance to detect if is insane of a wall
                     /*if (Physics.Raycast(unturnedPlayer.Position, unturnedPlayer.Player.look.aim.forward, out hit, 100, RayMasks.BARRICADE | RayMasks.LARGE | RayMasks.MEDIUM | RayMasks.SMALL | RayMasks.STRUCTURE | RayMasks.RESOURCE))
                     {
                         if (hit.distance <= 0.0)
@@ -276,8 +291,17 @@ namespace DAC
         [Obsolete]
         public static void take_items_through_walls(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P)
         {
-            if (player.HasPermission("*") || player.IsAdmin)
-            { 
+            RocketPlayer rocketPlayer = new RocketPlayer(player.Id);
+
+            if (!player.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
+            {
+                RaycastHit hit;
+
+                // I'm working on it
+                /*if (Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward, out hit, 2.5f, RayMasks.ITEM | RayMasks.PLAYER_INTERACT))
+                {
+
+                }*/
             }
         }
 
