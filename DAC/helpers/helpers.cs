@@ -57,7 +57,7 @@ namespace DAC
 
         public static float GetPlayerPing(UnturnedPlayer killer)
         {
-            return (float)killer.Ping * 1000;
+            return (float)Math.Round((float)killer.Ping * 1000);
         }
 
         [Obsolete]
