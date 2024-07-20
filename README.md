@@ -12,7 +12,8 @@ You can have a reporting system that generate <b>spy images</b>, where it will s
     <img height="500px;" src=".github\image-examples\example.png"></img>
 </div>
 <div align="center">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/hzJNutQ1Lms?si=FkRRyAlj_WwEONwR" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <p>Some proofs of testings</p>
+    https://www.youtube.com/embed/hzJNutQ1Lms?si=FkRRyAlj_WwEONwR
 </div>
 
 <h1>What can detect?</h1>
