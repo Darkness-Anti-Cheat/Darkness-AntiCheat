@@ -53,7 +53,7 @@ namespace DAC
         public bool clumsy_detect_fake_lag;
         public float player_ping;
 
-        public bool take_items_through_walls_detection;
+        //public bool take_items_through_walls_detection;
 
         public bool kick;
         public bool ban;
@@ -106,7 +106,7 @@ namespace DAC
             noclip_detection = true;
             noclip_detection_rate = 3;
 
-            take_items_through_walls_detection = true;
+            //take_items_through_walls_detection = true;
 
             kick = true;
             ban = false;
