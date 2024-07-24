@@ -214,7 +214,7 @@ namespace DAC
                                 Darkness_Anti_Cheat_Functions.webhook_logs(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, $"({reason})");
 
                                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been punished for '<color=red>{reason}</color>'", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
+                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been punished for '<color=red>{reason}</color>'".Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
 
                                 Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
                                 Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.execute(unturnedPlayer, reason));
@@ -228,14 +228,14 @@ namespace DAC
                         if (!unturnedPlayer.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
                         {
                             // it's using fake lag?
-                            if (unturnedPlayer.Player.input.IsUnderFakeLagPenalty)
+                            if (unturnedPlayer.Player.input.IsUnderFakeLagPenalty && 250 <= Darkness_Anti_Cheat_Functions.GetPlayerPing(unturnedPlayer))
                             {
                                 Darkness_Anti_Cheat_Functions.send_report(null, unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, $"({reason})"); // lets take a screenshot and generate auto report
 
                                 Darkness_Anti_Cheat_Functions.webhook_logs(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, $"({reason})");
 
                                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been punished for '<color=red>{reason}/color>'", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
+                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been punished for '<color=red>{reason}/color>'".Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
 
                                 Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
                                 Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.execute(unturnedPlayer, reason));
@@ -260,7 +260,7 @@ namespace DAC
                                 Darkness_Anti_Cheat_Functions.webhook_logs(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.logs, $"({reason})");
 
                                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.global_chat)
-                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been punished for '<color=red>{reason}color>'", Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
+                                    ChatManager.serverSendMessage($"<color=#2391DE>[DAC]</color> {unturnedPlayer.DisplayName} has been punished for '<color=red>{reason}color>'".Replace('(', '<').Replace(')', '>'), Color.white, null, null, EChatMode.GLOBAL, "https://darknesscommunity.club/assets/plugins/images/server/anticheat.png");
 
 
                                 Darkness_Anti_Cheat.Instance.StartCoroutine(Darkness_Anti_Cheat_Functions.screenshot(unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook)); // lets take a screenshot and generate auto report
@@ -332,9 +332,8 @@ namespace DAC
         // auto report system
         public static void auto_report(CSteamID killer, UnturnedPlayer player, ELimb limb)
         {
-            UnturnedPlayer Killer = UnturnedPlayer.FromCSteamID(killer);
-
-            if (Killer != null && player != null)
+            UnturnedPlayer Killer = UnturnedPlayer.FromCSteamID(killer) ?? null;
+            if (Killer != null && player != null && limb.ToString() != "")
             {
                 // check headshots
                 if (limb == ELimb.SKULL)
