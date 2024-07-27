@@ -65,7 +65,7 @@ namespace DAC
                     return;
             }
 
-            RaycastHit hit;
+            RaycastHit hit, other_hit;
             if (!Killer.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
             {
                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.aimbot_detection && cause == EDeathCause.GUN)
@@ -77,10 +77,10 @@ namespace DAC
 
                         // Silent aimbot detection through the walls, if player is looking at wall, structure or anything and not a player, and still hitting the player, is using cheats
                         // Only with weapons, not with grenades or rocket launchers
-                        if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.BARRICADE | RayMasks.STRUCTURE | RayMasks.VEHICLE | RayMasks.RESOURCE))
+                        if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.BARRICADE | RayMasks.STRUCTURE | RayMasks.VEHICLE | RayMasks.RESOURCE | RayMasks.PLAYER))
                         {
-                            // if player is visible, just don't do the detection (need to test it with this, i didn't test it with a real cheat)
-                            if (!Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.PLAYER))
+                            // Test it with real anti cheat, if player is not visible or not targeting him and shooting through walls, detect it as silent-aim
+                            if (hit.transform == null || !hit.transform.CompareTag("Enemy"))
                             {
                                 Killer.GetComponent<PlayerComponent>().RateAim++;
 
@@ -228,7 +228,7 @@ namespace DAC
                         if (!unturnedPlayer.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
                         {
                             // it's using fake lag?
-                            if (unturnedPlayer.Player.input.IsUnderFakeLagPenalty && 250 <= Darkness_Anti_Cheat_Functions.GetPlayerPing(unturnedPlayer))
+                            if (250 <= Darkness_Anti_Cheat_Functions.GetPlayerPing(unturnedPlayer) && unturnedPlayer.Player.input.IsUnderFakeLagPenalty)
                             {
                                 Darkness_Anti_Cheat_Functions.send_report(null, unturnedPlayer, Darkness_Anti_Cheat.Instance.Configuration.Instance.auto_reports_webhook, $"({reason})"); // lets take a screenshot and generate auto report
 

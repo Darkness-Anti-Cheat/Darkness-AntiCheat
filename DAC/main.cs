@@ -39,7 +39,7 @@ namespace DAC
 
             if (Configuration.Instance.noclip_detection) Darkness_Anti_Cheat_Functions.Log("no_clip event loaded", ConsoleColor.DarkCyan);
             if (Configuration.Instance.anti_free_cam) Darkness_Anti_Cheat_Functions.Log("anti_free_cam event loaded", ConsoleColor.DarkCyan);
-            if (Configuration.Instance.clumsy_detect_fake_lag) Darkness_Anti_Cheat_Functions.Log("clumsy_detect_fake_lag event loaded", ConsoleColor.DarkCyan);
+            if (Configuration.Instance.clumsy_detect_fake_lag) Darkness_Anti_Cheat_Functions.Log("clumsy_detect_fake_lag event loaded (beta feature)", ConsoleColor.DarkCyan);
             ThreadPool.QueueUserWorkItem((yes) => StartCoroutine(Darkness_Anti_Cheat_Events.get_players_detection()));
 
             if (Configuration.Instance.abuse_detection)

@@ -39,6 +39,29 @@ namespace DAC
             CodeHotkey4 = 13
         }
 
+        public static UnityEngine.Vector3 PiVector = new UnityEngine.Vector3(0, Mathf.PI, 0);
+        public static UnityEngine.Vector3 GetHitbox(Transform target, ELimb hitbox)
+        {
+            if (target == null)
+                return PiVector;
+
+            Transform[] componentsInChildren = target.GetComponentsInChildren<Transform>();
+
+            if (componentsInChildren == null)
+                return PiVector;
+
+            Transform[] array = componentsInChildren;
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                Transform tr = array[i];
+                if (tr.name == hitbox.ToString())
+                    return tr.position + new UnityEngine.Vector3(0f, 0.4f, 0f);
+            }
+
+            return PiVector;
+        }
+
         public static void Log(string message, ConsoleColor color)
         {
             Console.ForegroundColor = color;
@@ -47,10 +70,10 @@ namespace DAC
 
         public static float CalculateDistance(UnturnedPlayer killer, UnturnedPlayer victim)
         {
-            Vector3 killerPosition = killer.Player.transform.position;
-            Vector3 victimPosition = victim.Player.transform.position;
+            UnityEngine.Vector3 killerPosition = killer.Player.transform.position;
+            UnityEngine.Vector3 victimPosition = victim.Player.transform.position;
 
-            float distance = Vector3.Distance(killerPosition, victimPosition);
+            float distance = UnityEngine.Vector3.Distance(killerPosition, victimPosition);
 
             return distance;
         }
@@ -81,7 +104,7 @@ namespace DAC
             {
                 if (otherPlayer != targetPlayer)
                 {
-                    float distance = Vector3.Distance(targetPlayer.Position, otherPlayer.Position);
+                    float distance = UnityEngine.Vector3.Distance(targetPlayer.Position, otherPlayer.Position);
 
                     if (distance < closestDistance)
                     {
