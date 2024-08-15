@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using static SDG.Provider.SteamGetInventoryResponse;
 
 namespace DAC
 {
@@ -80,7 +81,7 @@ namespace DAC
                         if (Physics.Raycast(Killer.Player.look.aim.position, Killer.Player.look.aim.forward, out hit, gunAsset.range, RayMasks.BARRICADE | RayMasks.STRUCTURE | RayMasks.VEHICLE | RayMasks.RESOURCE | RayMasks.PLAYER))
                         {
                             // Test it with real anti cheat, if player is not visible or not targeting him and shooting through walls, detect it as silent-aim
-                            if (hit.transform == null || !hit.transform.CompareTag("Enemy"))
+                            if (hit.transform != null && hit.transform.tag != "Player")
                             {
                                 Killer.GetComponent<PlayerComponent>().RateAim++;
 
@@ -107,7 +108,6 @@ namespace DAC
                     }
                 }
 
-                // Cannot detect Melee, i'm do lazy do it xd
                 // Range changer hack detection, max of punch distance is 2, but i put more cause the lag compensation can fail
                 if (Darkness_Anti_Cheat.Instance.Configuration.Instance.punch_override_distance_detection)
                 {
@@ -183,7 +183,7 @@ namespace DAC
             while (true)
             {
                 // Don't rape the CPU server
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(3f);
 
                 foreach (SteamPlayer list in Provider.clients)
                 {
@@ -269,6 +269,22 @@ namespace DAC
                         }
                     }
 
+
+                    /*List<InteractableItem> itemsInRadius;
+                    Darkness_Anti_Cheat_Functions.GetItemsInRadius(unturnedPlayer, out itemsInRadius, 8, 395f);
+
+                    if (!(itemsInRadius.Count < 1))
+                    {
+                        foreach (InteractableItem i in itemsInRadius)
+                        {
+                            float dst = Vector3.Distance(i.transform.position, unturnedPlayer.Player.transform.position);
+                            if (dst < 2)
+                                continue;
+
+                            UnturnedChat.Say($"{i.asset.name}");
+                        }
+                    }*/
+
                     // Just doing some test with vehicle no-clip, getting distance to detect if is insane of a wall
                     /*if (Physics.Raycast(unturnedPlayer.Position, unturnedPlayer.Player.look.aim.forward, out hit, 100, RayMasks.BARRICADE | RayMasks.LARGE | RayMasks.MEDIUM | RayMasks.SMALL | RayMasks.STRUCTURE | RayMasks.RESOURCE))
                     {
@@ -293,16 +309,7 @@ namespace DAC
         {
             RocketPlayer rocketPlayer = new RocketPlayer(player.Id);
 
-            if (!player.IsAdmin && !rocketPlayer.HasPermission("*") && !rocketPlayer.HasPermission("dac_bypass"))
-            {
-                RaycastHit hit;
-
-                // I'm working on it
-                /*if (Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward, out hit, 2.5f, RayMasks.ITEM | RayMasks.PLAYER_INTERACT))
-                {
-
-                }*/
-            }
+            UnturnedChat.Say($"{P.interactableItem.transform.position}");
         }
 
         public static void chat_log(UnturnedPlayer player, string message)

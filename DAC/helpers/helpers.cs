@@ -116,6 +116,30 @@ namespace DAC
 
             return closestPlayer;
         }
+
+        // Reverse from random cheat
+        public static void GetItemsInRadius(UnturnedPlayer player, out List<InteractableItem> items, int RegionReach, float MaxMagnitude)
+        {
+            items = new List<InteractableItem>();
+
+            List<ItemRegion> regionsInRadius = new List<ItemRegion>();
+
+            for (int x = 0; x < 64; x++)
+                for (int y = 0; y < 64; y++)
+                    if (ItemManager.regions[x, y] != null)
+                        if (ItemManager.regions[x, y].drops.Count > 0)
+                            if ((x <= player.Player.movement.region_x && y <= player.Player.movement.region_y && (player.Player.movement.region_x - x) <= RegionReach && (player.Player.movement.region_y - y) <= RegionReach) ||
+                            (x >= player.Player.movement.region_x && y >= player.Player.movement.region_y && (x - player.Player.movement.region_x) <= RegionReach && (y - player.Player.movement.region_y) <= RegionReach))
+                                regionsInRadius.Add(ItemManager.regions[x, y]);
+
+            foreach (ItemRegion x in regionsInRadius)
+                foreach (ItemDrop y in x.drops)
+                    if (!y.interactableItem.checkInteractable() || !y.interactableItem.checkUseable())
+                        continue;
+                    else if ((y.interactableItem.transform.position - player.Player.transform.position).sqrMagnitude < MaxMagnitude)
+                        items.Add(y.interactableItem);
+        }
+
         public static byte[] ByteArray(string imagePath)
         {
             byte[] imageByteArray = null;

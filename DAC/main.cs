@@ -51,7 +51,7 @@ namespace DAC
             UnturnedPlayerEvents.OnPlayerChatted += OnPlayerChatted; Darkness_Anti_Cheat_Functions.Log("OnPlayerChatted event loaded", ConsoleColor.DarkCyan);
             DamageTool.playerDamaged += OnPlayerDamage; Darkness_Anti_Cheat_Functions.Log("OnPlayerDamage event loaded", ConsoleColor.DarkCyan);
             U.Events.OnPlayerConnected += OnPlayerConnect; Darkness_Anti_Cheat_Functions.Log("OnPlayerConnect event loaded", ConsoleColor.DarkCyan);
-            UnturnedPlayerEvents.OnPlayerInventoryAdded += OnPlayerInventoryAdded; Darkness_Anti_Cheat_Functions.Log("OnPlayerInventoryAdded event loaded", ConsoleColor.DarkCyan);
+            //UnturnedPlayerEvents.OnPlayerInventoryAdded += OnPlayerInventoryAdded; Darkness_Anti_Cheat_Functions.Log("OnPlayerInventoryAdded event loaded", ConsoleColor.DarkCyan);
 
             Level.onPostLevelLoaded += OnPostLevelLoaded;
             if (Level.isLoaded)
@@ -74,7 +74,7 @@ namespace DAC
             }
 
             DamageTool.playerDamaged -= OnPlayerDamage; Darkness_Anti_Cheat_Functions.Log("OnPlayerDamage event unloaded", ConsoleColor.DarkCyan);
-            UnturnedPlayerEvents.OnPlayerInventoryAdded -= OnPlayerInventoryAdded; Darkness_Anti_Cheat_Functions.Log("OnPlayerInventoryAdded event unloaded", ConsoleColor.DarkCyan);
+            //UnturnedPlayerEvents.OnPlayerInventoryAdded -= OnPlayerInventoryAdded; Darkness_Anti_Cheat_Functions.Log("OnPlayerInventoryAdded event unloaded", ConsoleColor.DarkCyan);
             Level.onPostLevelLoaded -= OnPostLevelLoaded;
             CancelInvoke("AutoAnnouncement");
 
@@ -86,7 +86,7 @@ namespace DAC
             Darkness_Anti_Cheat_Functions.Log("Let's destroy the game breakers...", ConsoleColor.Green);
         }
 
-        private void OnPlayerInventoryAdded(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P) => Darkness_Anti_Cheat_Events.take_items_through_walls(player, inventoryGroup, inventoryIndex, P);
+        //private void OnPlayerInventoryAdded(UnturnedPlayer player, InventoryGroup inventoryGroup, byte inventoryIndex, ItemJar P) => Darkness_Anti_Cheat_Events.take_items_through_walls(player, inventoryGroup, inventoryIndex, P);
         private void OnPlayerChatted(UnturnedPlayer player, ref Color color, string message, SDG.Unturned.EChatMode chatMode, ref bool cancel) => Darkness_Anti_Cheat_Events.chat_log(player, message);
         private void OnPlayerConnect(UnturnedPlayer player) { player.Player.GetComponent<PlayerComponent>().Kills = 0; player.Player.GetComponent<PlayerComponent>().Deaths = 0; player.Player.GetComponent<PlayerComponent>().Headshots = 0; }
         private void OnPlayerDeath(UnturnedPlayer player, EDeathCause cause, ELimb limb, CSteamID killer) => Darkness_Anti_Cheat_Events.auto_report(killer, player, limb);
